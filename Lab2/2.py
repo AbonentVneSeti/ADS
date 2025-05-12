@@ -1,13 +1,25 @@
 import math
 import random
 
+#Точка пересечения двух прямых
+
+#Точка пересечения прямой и отрезка
+
+#Точка пересечения двух отрезков
+
+#Точка пересечения прямой и окружности
+
+#Точка пересечения отрезка и окружности
+
+#Точка пересечения двух окружностей
+
 class Point(object):
     def __init__(self,x : float,y : float):
         self.x = x
         self.y = y
 
     def __str__(self):
-        return "(" + str(self.x) + ',' + str(self.y) + ")"
+        return f"({self.x},{self.y})"
 
     def __eq__(self,other):
         return self.x == other.x and self.y == other.y
@@ -40,11 +52,13 @@ class Triangle(object):
         return not (self == other)
 
     def __str__(self):
-        return f"({str(self.p1)},{str(self.p2)},{str(self.p3)})"
+        return f"Triangle({str(self.p1)},{str(self.p2)},{str(self.p3)}):{self.area:.2f}"
+
+    def __repr__(self):
+        return str(self)
 
     def is_in(self,other) -> bool: #проверка, является ли треугольник self вложенным в other
         selfpoints = [self.p1,self.p2,self.p3]
-
 
         for i in selfpoints:
             t1 = Triangle(i,other.p2,other.p3)
@@ -52,15 +66,9 @@ class Triangle(object):
             t3 = Triangle(other.p1,other.p2,i)
             if not(other.area == t1.area + t2.area + t3.area):
                 return False
+            #elif t1.area == 0 or t2.area == 0 or t3.area == 0:
+            #    return False
         return True
-
-    # def get_area(self):
-    #     a = distance(self.p1,self.p2)
-    #     b = distance(self.p2,self.p3)
-    #     c = distance(self.p3,self.p1)
-    #     p = (a+b+c)/2
-    #     return math.sqrt(p*(p-a)*(p-b)*(p-c))
-
 
 def is_on_line(p1: Point,p2 : Point, p3: Point):
     return p3.x * (p2.y - p1.y) - p3.y * (p2.x - p1.x) == p1.x * p2.y - p2.x * p1.y
@@ -89,42 +97,34 @@ def proggres(a):
     if a == 100:
         print(f"\r",'',sep = '',end = "")
 
-def main():
-    #points = console_input()
-    points = rand_input()
-
+def check_occur(points):
     triangles = list()
 
-    for p1_ind in range(len(points)-2):
-        for p2_ind in range(p1_ind + 1,len(points)-1):
-            for p3_ind in range(p2_ind + 1,len(points)):
-                triangles.append( Triangle(points[p1_ind],points[p2_ind],points[p3_ind]) )
+    for p1_ind in range(len(points) - 2):
+        for p2_ind in range(p1_ind + 1, len(points) - 1):
+            for p3_ind in range(p2_ind + 1, len(points)):
+                t1 = Triangle(points[p1_ind],points[p2_ind],points[p3_ind])
+                n = 0
+                while n< len(triangles):
+                    if t1.area > triangles[n].area:
+                        break
+                    n+=1
+                triangles.insert(n,t1)
 
-    #for proggres
-    lastprog = -2
+                for i in range(len(triangles)-1,n,-1):
+                    if triangles[i].is_in(t1):
+                        print(f"Да, есть вложенные треугольники, пример: {triangles[i]} вложен в {t1}")
+                        return True
+                for i in range(0,n):
+                    if t1.is_in(triangles[i]):
+                        print(f"Да, есть вложенные треугольники, пример: {t1} вложен в {triangles[i]}")
+                        return True
+    print("Не существует таких точек, чтобы треугольники составленные из их координат оказались вложенными")
+    return False
 
-    for i in range(len(triangles)-1):
-        for j in range(i+1,len(triangles)):
-            if triangles[i].area< triangles[j].area:
-                triangles[i],triangles[j] = triangles[j],triangles[i]
-
-            # for proggres
-            tmp = int((i/(len(triangles)-2))*100)
-            if tmp != lastprog:
-                proggres(tmp)
-                lastprog = tmp
-
-    flag = True
-    for i in range(len(triangles)-1):
-        for j in range(i+1,len(triangles)):
-            if triangles[j].is_in(triangles[i]):
-                print(f"Да, есть вложенные треугольники, пример: {triangles[j]} вложен в {triangles[i]}")
-                flag = False
-                break
-        if not flag:
-            break
-    if flag:
-        print("Не существует таких точек, чтобы треугольники составленные из их координат оказались вложенными")
+def main():
+    points = rand_input()
+    check_occur(points)
 
 if __name__ == "__main__":
     main()
