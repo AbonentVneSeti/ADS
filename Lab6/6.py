@@ -22,7 +22,6 @@ def rabin_karp_search(sample : str, search_str : str) -> int:
         if i < len(search_str) - len(sample):
             window_hash = (window_hash - ord(search_str[i]) * power) % MOD
             window_hash = (window_hash * BASE + ord(search_str[i + len(sample)])) % MOD
-            window_hash = (window_hash + MOD) % MOD
 
     return -1
 
