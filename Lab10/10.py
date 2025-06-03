@@ -1,49 +1,40 @@
-import math
+class Building:
+    def __init__(self, critical_floor):
+        self.critical_floor = critical_floor
+
+    def drop_egg(self, floor):
+        return floor >= self.critical_floor
 
 
-def optimal_step(total_floors):
-    return math.ceil((math.sqrt(8 * total_floors + 1) - 1) / 2)
-
-
-def egg_broken(floor, critical_floor):
-    return floor >= critical_floor
-
-
-def find_critical_floor(total_floors=100, critical_floor = 100):
-    import random
-
-    step = optimal_step(total_floors)
+def find_critical_floor(building):
+    low = 0
+    step = 14
     current_floor = step
-    eggs_left = 2
+    eggs = 2
     throws = 0
 
-    while eggs_left > 0 and current_floor <= total_floors:
+    while eggs > 1 and current_floor <= 100:
         throws += 1
-        if egg_broken(current_floor, critical_floor):
-            eggs_left -= 1
-            lower_floor = current_floor - step + 1 if step > 1 else 1
-            for floor in range(lower_floor, current_floor):
-                throws += 1
-                if egg_broken(floor, critical_floor):
-                    return floor, throws
-            return current_floor, throws
+        if building.drop_egg(current_floor):
+            eggs -= 1
         else:
+            low = current_floor
             step -= 1
             current_floor += step
+            if current_floor > 100:
+                current_floor = 100
 
-    if current_floor > total_floors:
-        throws += 1
-        if egg_broken(total_floors, critical_floor):
-            eggs_left -= 1
-            lower_floor = total_floors - step + 1
-            for floor in range(lower_floor, total_floors):
-                throws += 1
-                if egg_broken(floor, critical_floor):
-                    return floor, throws
-            return total_floors, throws
-        else:
-            return -1, throws
+    if eggs == 1:
+        for floor in range(low + 1, current_floor):
+            throws += 1
+            if building.drop_egg(floor):
+                return floor, throws
+        return current_floor, throws
+    else:
+        return None, throws
 
 
-critical_floor, throws = find_critical_floor(100,5)
-print(f"Результат: критический этаж = {critical_floor}, бросков = {throws}")
+if __name__ == "__main__":
+    for i in range(1,101):
+        critical_floor, throws = find_critical_floor(Building(i))
+        print(f"Результат(критический этаж = {i}): критический этаж = {critical_floor}, бросков = {throws}")

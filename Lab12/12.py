@@ -19,9 +19,9 @@ def knapsack_bruteforce(values, weights, capacity):
 
 
 if __name__ == "__main__":
-    values = [60, 100, 120]  # Стоимости предметов
-    weights = [10, 20, 30]  # Веса предметов
-    capacity = 50  # Вместимость рюкзака
+    values = [60, 100, 120]
+    weights = [10, 20, 30]
+    capacity = 50
 
     max_value, best_subset = knapsack_bruteforce(values, weights, capacity)
 
